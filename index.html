@@ -2,13 +2,17 @@
 <html lang="ja">
 <head>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <title>Execute Python Code</title>
 <meta charset="UTF-8">
 </head>
 <body>
+    <textarea id="python-code" rows="4" cols="50">print('Hello, world!')</textarea>
+    <button onclick="executePythonCode()">Execute Python Code</button>
 <script>
-    // Ajaxリクエストを送信する関数
+    // JavaScriptコードをここに配置する
     function executePythonCode() {
         var pythonCode = document.getElementById('python-code').value;
+
         // Ajaxリクエストを送信
         $.ajax({
             type: "POST",
