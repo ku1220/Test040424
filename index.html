@@ -1,243 +1,26 @@
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
-    <title>Ajaxアクセステンプレート</title>
+   <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Document</title>
+   <script>
+   $(function(){
+       $.ajax({
+           url: './test.py',
+           type: 'post',
+           data: {data:'テスト'}
+       }).done(function(data){
+           console.log(data);
+       }).fail(function(){
+           console.log('failed');
+       });
+   });
+   </script>
+
 </head>
-<style type="text/css">
-    #drop_zone {
-  border: 2px dashed #bbb;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
-  padding: 25px;
-  text-align: center;
-  font: 20pt bold 'Vollkorn';
-  color: #bbb;
-}
-  .thumb {
-    height: 75px;
-    border: 1px solid #000;
-    margin: 10px 5px 0 0;
-  }
-</style>
-
 <body>
-    <h1>Hello, world!</h1>
-
-    <button onclick="server_load_Json()">load</button>
-    <button onclick="server_save_Json()">save</button>
-
-    <h3><a hfre="http://www.html5rocks.com/ja/tutorials/file/dndfiles/">JavaScriptでFileAPIを使用してファイルを読み込む</a></h3>
-
-    <div id="drop_zone">Drop files here</div>
-    <!-- <input type="file" id="files" name="files[]" multiple /> -->
-    <div id="file-name"></div>
-    <div id="result"></div>
-
-
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="jquery.xml2json.js" type="text/javascript" language="javascript"></script> 
+   <div>testtest</div>
 </body>
-
-
-<script>
-global_JSON = [];
-    /*
-    * JavaScriptでFileAPIを使用してファイルを読み込
-    * http://www.html5rocks.com/ja/tutorials/file/dndfiles/
-    * http://tmlife.net/programming/javascript/html5-file-api-file-read.html
-    * https://app.codegrid.net/entry/file-api-filereader-api
-    */    
-    var reader = new FileReader();
-
-    function handleFileSelect(evt) {
-        // (おまじない) これがないとtextファイルをそのままブラウザでひらいちゃう
-        evt.stopPropagation();
-        evt.preventDefault();
-
-        // ファイルリストを取得
-        var files = evt.dataTransfer.files; // FileList object
-        console.log(files);
-
-        for (var i = 0; i < files.length; i++) {
-            readfile(files[i]);
-        }
-        // ファイルの読み込み関数オープン
-        // readfile(files[0]);
-
-    }
-
-    function readfile(file){
-        console.log('readfile(file) > reader.onload() > run')
-
-        var reader = new FileReader();
-
-        reader.onload = (function(theFile) {
-        return function(e) {
-            console.log(e.target.result);
-            var json = $.xml2json(e.target.result);
-            console.log(json);
-            console.log(json.trk.name);
-            console.log(json.trk.trkseg.trkpt);
-            global_JSON = json;
-
-
-          $("#file-name").append("<p>" + escape(theFile.name) + "</p>")
-          // $("#result").text(e.target.result)
-        };
-      })(file);
-        var encode_type = 'shift-jis'
-        reader.readAsText(file, encode_type)
-    }
-
-
-    function handleDragOver(evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
-        evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-    }
-
-    // Setup the dnd listeners.
-    var dropZone = document.getElementById('drop_zone');
-    dropZone.addEventListener('dragover', handleDragOver, false);
-    dropZone.addEventListener('drop', handleFileSelect, false);
-
-</script>
-
-<script type="text/javascript">
-/* *****************************************
-*
-*
-*
-/*******************************************/
-
-// 返却されたデータを格納するグローバル変数
-global_result = []
-
-
-$(function(){
-	console.log("SCRIPT LOAD ..")
-
-    // Check for the various File API support.
-    if (window.File && window.FileReader && window.FileList && window.Blob) {
-      // Great success! All the File APIs are supported.
-    } else {
-      alert('The File APIs are not fully supported in this browser.');
-    }
-
-});
-
-
-
-
-function server_load_Json() {
-	/*
-	* サーバー上のCGIスクリプトを実行し
-	* データを取得
-	*
-	*/
-
-	console.log("server_load_Json  ..")
-
-    $.ajax({
-        url: "/cgi-bin/ajax-demo/api/api_json_load.py",
-        type: "POST",
-        //必要ないがサーバ側との整合のために明示しておいた方がよい。
-        // contentType: "Content-Type: application/json; charset=UTF-8",
-        // 必要ないがサーバ側との整合のために明示しておいた方がよい。
-        // dataType: 'json' //受信形式 
-        // data:send_data
-    }).success(function(data, status, xhr) {
-        console.log("/* 通信成功 server_load_Json */");
-        console.log("success");
-        console.log("data =" + data);
-        console.log("data.length =" + data.length);
-        console.log("status =" + status);
-        console.log("xhr =" + xhr);
-
-        console.log("> load data (JSON) :" + data);
-        
-        // 得られたJSONデータをパース
-        global_result = JSON.parse(data);
-        console.log("> パース後のデータ data :" + global_result);
-
-        // 取得した結果をjQueryを使ってHTML内部に書き出し
-        $('#result').text(global_result);
-
-    }).error(function(xhr, status, error) {
-        // 通信失敗時の処理
-        console.log("/* 通信失敗 */");
-    }).complete(function(xhr, status) {
-        // 通信完了時の処理
-        console.log("/* 通信終了 */");
-    });
-}
-
-function server_save_Json() {
-	/*
-	* サーバー上のCGIスクリプトを実行し
-	* データを取得
-	*
-	*/
-
-	// 現在の時刻を取得
-	// var date_obj = new Date();
-	// 時刻を文字列で取得
-	// date = date_obj.toLocaleString()
-
-	// POSTで送るように，生計
-	// send_data = {date:date}
-    // send_data = global_JSON;
-    // name = global_JSON.trk.name;
-    // trkpt = global_JSON.trk.trkseg.trkpt;
-
-    // send_data = {json:global_JSON};
-    // global_JSON = {
-    //         "no1": [1,2,3],
-    //         "no2": [4,5,6]
-    //     }
-    global_JSON = JSON.stringify(global_JSON);
-    send_data = {data:global_JSON}
-
-    
-    console.log(send_data);
-	console.log("server_save_Json  ..")
-
-    $.ajax({
-        url: "/cgi-bin/ajax-demo/api/api_json_save.py",
-        type: "POST",
-        //必要ないがサーバ側との整合のために明示しておいた方がよい。
-        // contentType: "Content-Type: application/json; charset=UTF-8",
-        // 必要ないがサーバ側との整合のために明示しておいた方がよい。
-        // dataType: 'json', //受信形式 
-        data:send_data
-    }).success(function(data, status, xhr) {
-        console.log("/* 通信成功 server_save_Json*/");
-        console.log("success");
-        console.log("data =" + data);
-        console.log("data.length =" + data.length);
-        console.log("status =" + status);
-        console.log("xhr =" + xhr);
-
-        $("#result").append(data);
-
-
-    }).error(function(xhr, status, error) {
-        // 通信失敗時の処理
-        console.log("/* 通信失敗 */");
-        $("#result").append("<p>"+xhr);
-        $("#result").append("<p>"+status);
-        $("#result").append("<p>"+error);
-
-    }).complete(function(xhr, status) {
-        // 通信完了時の処理
-        console.log("/* 通信終了 */");
-    });
-}
-
-
-</script>
-
 </html>
