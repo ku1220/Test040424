@@ -6,12 +6,25 @@
 </head>
 <body>
 <script>
-    $.ajax({
-    }).done(function(response){
-        alert("OK");
-    }).fail(function(){
-        alert("failed");
-    });
+    // Ajaxリクエストを送信する関数
+    function executePythonCode() {
+        var pythonCode = document.getElementById('python-code').value;
+    
+        // Ajaxリクエストを送信
+        $.ajax({
+            type: "POST",
+            url: "/execute_python",
+            contentType: "application/json",
+            data: JSON.stringify({code: pythonCode}),
+            success: function(response) {
+                console.log("Pythonの実行結果:", response.result);
+                // ここで結果を適切に表示するなどの処理を行う
+            },
+            error: function(error) {
+                console.error("エラーが発生しました:", error);
+            }
+        });
+    }
 </script>
 </body>
 </html>
